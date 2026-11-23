@@ -1,4 +1,7 @@
-# 공개 저장소에는 호환표 페이지만 올립니다
+# 공개 저장소에는 호환표 페이지와 바로가기 이미지만 올립니다
 *
 !index.html
 !.gitignore
+!img/
+!img/size-guide-a.png
+!img/size-guide-b.png
