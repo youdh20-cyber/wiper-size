@@ -125,7 +125,13 @@ let maker = "전체";
 const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 const SOFT = { "ㄲ":"ㄱ","ㄸ":"ㄷ","ㅃ":"ㅂ","ㅆ":"ㅅ","ㅉ":"ㅈ" };
 const cho = s => [...s].map(c => { const k = c.charCodeAt(0) - 0xAC00; const r = k >= 0 && k < 11172 ? CHO[Math.floor(k / 588)] : c; return SOFT[r] || r; }).join("");
-const norm = s => String(s || "").toLowerCase().replace(/[\s\-_().·/,'’~]/g, "");
+/* 헷갈리기 쉬운 표기를 같게 취급: ㅐ/ㅔ(트랙스·트렉스), ㅙ/ㅚ/ㅞ, 쌍자음(쏘나타·소나타, 싼타페·산타페), 져/저 */
+const FOLD_CHO = {1:0,4:3,8:7,10:9,13:12}, FOLD_JUNG = {1:5,3:7,10:15,11:15};
+const fold = s => [...s].map(ch => { const k = ch.charCodeAt(0) - 0xAC00; if (k < 0 || k >= 11172) return ch;
+  let c = Math.floor(k / 588), j = Math.floor((k % 588) / 28); const t = k % 28;
+  c = FOLD_CHO[c] ?? c; j = FOLD_JUNG[j] ?? j; if ((c === 12 || c === 14) && j === 6) j = 4;
+  return String.fromCharCode(0xAC00 + (c * 21 + j) * 28 + t); }).join("");
+const norm = s => fold(String(s || "").toLowerCase().replace(/[\s\-_().·/,'’~]/g, ""));
 const isCho = s => /^[ㄱ-ㅎ]+$/.test(s);
 
 const cars = DATA.cars.map(c => { const k = norm(c.m + c.n); return { ...c, k, kc: cho(k) }; });
